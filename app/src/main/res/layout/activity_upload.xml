@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 상단 앱바: 좌측 로고 + Auto EDA 텍스트 -->
+        <ImageView
+            android:id="@+id/ivTopLogo"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Auto EDA"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/ivTopLogo"
+            app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toEndOf="@id/ivTopLogo" />
+
+        <!-- 업로드 박스 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layoutFileField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:id="@+id/tvUploadLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upload CSV/XLSX/ZIP File"
+                    android:textColor="#555555"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/fileNameContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/etFileName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Choose a file"
+                        android:textColor="#999999"
+                        android:textSize="16sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btnClearFile"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/btnClearFile"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="Clear file"
+                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Start EDA / Download result 버튼 -->
+        <Button
+            android:id="@+id/btnStartEda"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_blue_button"
+            android:text="Start EDA"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/layoutFileField"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnDownloadResult"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnDownloadResult"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Download result"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/btnStartEda"
+            app:layout_constraintBottom_toBottomOf="@id/btnStartEda"
+            app:layout_constraintStart_toEndOf="@id/btnStartEda"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <!-- Overview 타이틀 -->
+        <TextView
+            android:id="@+id/tvOverviewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Overview"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/btnStartEda"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Rows 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRows"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/tvOverviewTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cardColumns">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rows"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvRowsValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Columns 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardColumns"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/tvOverviewTitle"
+            app:layout_constraintStart_toEndOf="@id/cardRows"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Columns"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvColumnsValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- File Size 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardFileSize"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardRows"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@drawable/card_rounded_border">
+
+                <ImageView
+                    android:id="@+id/ivFileIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_save" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="File Size"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFileSizeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Numeric 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardNumeric"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardFileSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cardCategorical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Numeric"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvNumericValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Categorical 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardCategorical"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardFileSize"
+            app:layout_constraintStart_toEndOf="@id/cardNumeric"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categorical"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvCategoricalValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- View Detailed Analysis 링크 텍스트 -->
+        <TextView
+            android:id="@+id/tvViewDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:text="View Detailed Analysis →"
+            android:textColor="#1E63FF"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardNumeric"
+            app:layout_constraintVertical_bias="0.196" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

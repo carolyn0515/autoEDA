@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 상단 앱바 -->
+        <ImageView
+            android:id="@+id/ivTopLogo"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Auto EDA"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/ivTopLogo"
+            app:layout_constraintTop_toTopOf="@id/ivTopLogo"
+            app:layout_constraintBottom_toBottomOf="@id/ivTopLogo" />
+
+
+        <!-- 네비 버튼: Histogram 강조 (2 x 2) -->
+        <Button
+            android:id="@+id/btnNavColumnStats"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Column Statistics"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnNavDataQuality"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnNavDataQuality"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Data Quality"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/btnNavColumnStats"
+            app:layout_constraintBottom_toBottomOf="@id/btnNavColumnStats"
+            app:layout_constraintStart_toEndOf="@id/btnNavColumnStats"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnNavHistogram"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/rounded_blue_button"
+            android:text="Histogram"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/btnNavColumnStats"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnNavTargetAnalysis"
+            app:layout_constraintHorizontal_weight="1" />
+
+
+        <!-- Select Column -->
+
+        <Button
+            android:id="@+id/btnNavTargetAnalysis"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Target Analysis"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/btnNavHistogram"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/btnNavHistogram"
+            app:layout_constraintTop_toTopOf="@id/btnNavHistogram"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardSelectColumn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/btnNavHistogram"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_rounded_border"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Column"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvHistogramColumn"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:color/transparent"
+                    android:completionThreshold="1"
+                    android:hint="Choose column"
+                    android:inputType="none" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Numerical bin size -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardBinOption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardSelectColumn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/layoutBinOption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_rounded_border"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bin Size (numeric data)"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvBinSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Select bin size"
+                    android:inputType="none" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Histogram Chart -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardHistogram"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardBinOption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/layoutHistogramBars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_rounded_border"
+                android:orientation="vertical"
+                android:padding="12dp" />
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Ratio Table -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRatioTable"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardHistogram"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TableLayout
+                android:id="@+id/tableValueRatio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_rounded_border"
+                android:padding="12dp"
+                android:stretchColumns="0,1,2" />
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

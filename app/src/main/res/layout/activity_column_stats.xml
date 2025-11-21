@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 상단 앱바 -->
+        <ImageView
+            android:id="@+id/ivTopLogo"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Auto EDA"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/ivTopLogo"
+            app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toEndOf="@id/ivTopLogo" />
+
+        <!-- 네비 버튼 -->
+        <Button
+            android:id="@+id/btnNavColumnStats"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_blue_button"
+            android:text="Column Statistics"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnNavDataQuality"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnNavDataQuality"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Data Quality"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/btnNavColumnStats"
+            app:layout_constraintBottom_toBottomOf="@id/btnNavColumnStats"
+            app:layout_constraintStart_toEndOf="@id/btnNavColumnStats"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnNavHistogram"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Histogram"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/btnNavColumnStats"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnNavTargetAnalysis"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/btnNavTargetAnalysis"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_gray_button"
+            android:text="Target Analysis"
+            android:textAllCaps="false"
+            android:textColor="#444444"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/btnNavHistogram"
+            app:layout_constraintBottom_toBottomOf="@id/btnNavHistogram"
+            app:layout_constraintStart_toEndOf="@id/btnNavHistogram"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+
+        <!-- General Statistics 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardGeneralStats"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/btnNavHistogram"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_rounded_border"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvGeneralStatsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="General Statistics"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TableLayout
+                    android:id="@+id/tableGeneralStats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="0,1,2,3,4,5">
+
+                    <TableRow>
+                        <TextView android:text="Column" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                        <TextView android:text="Mean" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                        <TextView android:text="Std" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                        <TextView android:text="Min" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                        <TextView android:text="Max" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                        <TextView android:text="%" android:textStyle="bold" android:gravity="center" android:padding="4dp"/>
+                    </TableRow>
+
+                </TableLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Type Summary 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardTypeSummary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardGeneralStats"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_rounded_border"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvTypeSummaryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Type Summary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTypeSummaryValues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Numeric: 5    Categorical: 4    Text: 0"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Target Column 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardTargetColumn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardTypeSummary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_rounded_border"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvTargetColumnTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Target Column"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actvTargetColumn"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:hint="Specify target column"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="14sp"
+                        android:background="@android:color/transparent"
+                        android:inputType="none"
+                        android:completionThreshold="1"
+                        android:dropDownHeight="wrap_content"
+                        android:dropDownWidth="match_parent" />
+
+                    <Button
+                        android:id="@+id/btnSetTarget"
+                        android:layout_width="72dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/rounded_blue_button"
+                        android:text="Set"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
