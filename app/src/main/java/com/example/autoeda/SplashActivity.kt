@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, UploadActivity::class.java)
             startActivity(intent)
-            finish()   // 뒤로가기 눌러도 스플래시로 안 돌아오게
+            finish()
         }, 1500)
     }
 }

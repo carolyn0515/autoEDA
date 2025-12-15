@@ -10,15 +10,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <!-- 상단 앱바 -->
         <ImageView
             android:id="@+id/ivTopLogo"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/logo"
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,24 +30,25 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:text="Auto EDA"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="@id/ivTopLogo"
             app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"
             app:layout_constraintStart_toEndOf="@id/ivTopLogo" />
 
-        <!-- 네비 버튼: Data Quality 강조 -->
+        <!-- 네비 버튼: Data Quality 강조 (큼직하게) -->
         <Button
             android:id="@+id/btnNavColumnStats"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="24dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Column Statistics"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnNavDataQuality"
@@ -56,14 +57,15 @@
         <Button
             android:id="@+id/btnNavDataQuality"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/rounded_blue_button"
             android:text="Data Quality"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toTopOf="@id/btnNavColumnStats"
             app:layout_constraintBottom_toBottomOf="@id/btnNavColumnStats"
             app:layout_constraintStart_toEndOf="@id/btnNavColumnStats"
@@ -73,14 +75,15 @@
         <Button
             android:id="@+id/btnNavHistogram"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Histogram"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toBottomOf="@id/btnNavColumnStats"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnNavTargetAnalysis"
@@ -89,27 +92,27 @@
         <Button
             android:id="@+id/btnNavTargetAnalysis"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Target Analysis"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toTopOf="@id/btnNavHistogram"
             app:layout_constraintBottom_toBottomOf="@id/btnNavHistogram"
             app:layout_constraintStart_toEndOf="@id/btnNavHistogram"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1" />
 
-
         <!-- Missing Values 카드 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardMissingValues"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="32dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/btnNavHistogram"
@@ -121,42 +124,52 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/card_rounded_border"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/tvMissingTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Missing Values"
-                    android:textSize="14sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvMissingSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="Column-wise missing ratio"
-                    android:textSize="12sp" />
+                    android:textSize="14sp"
+                    android:textColor="#555555" />
 
                 <!-- 결측률 바들을 동적으로 넣을 컨테이너 -->
                 <LinearLayout
                     android:id="@+id/layoutMissingValues"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="vertical" />
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Tip: 20% 이상이면 결측 처리 전략이 필요해요."
+                    android:textSize="13sp"
+                    android:textColor="#777777" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
 
         <!-- Correlation Heatmap 카드 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardCorrHeatmap"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/cardMissingValues"
@@ -168,34 +181,59 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/card_rounded_border"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/tvCorrTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Correlation Heatmap"
-                    android:textSize="14sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvCorrSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="Pearson correlation between numeric columns"
-                    android:textSize="12sp" />
+                    android:textSize="14sp"
+                    android:textColor="#555555" />
 
-                <!-- 간단한 heatmap 테이블 -->
-                <TableLayout
-                    android:id="@+id/tableCorrHeatmap"
+                <!-- Heatmap은 가로 스크롤로 크게 보이게 -->
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:stretchColumns="1,2,3,4,5" />
+                    android:layout_marginTop="14dp"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <TableLayout
+                        android:id="@+id/tableCorrHeatmap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*"
+                        android:shrinkColumns="*" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Tip: |corr| ≥ 0.7이면 강한 상관이에요."
+                    android:textSize="13sp"
+                    android:textColor="#777777" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <!-- 맨 아래 여백 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            app:layout_constraintTop_toBottomOf="@id/cardCorrHeatmap"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

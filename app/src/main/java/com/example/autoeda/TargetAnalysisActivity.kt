@@ -1,17 +1,40 @@
 package com.example.autoeda
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.LinearLayout
+import kotlin.math.*
 
 class TargetAnalysisActivity : AppCompatActivity() {
 
     private lateinit var header: List<String>
     private lateinit var rows: List<List<String>>
+
+    private val BLUE = Color.parseColor("#1E63FF")
+    private val BLUE_SOFT = Color.parseColor("#EAF1FF")
+    private val TEXT_DARK = Color.parseColor("#222222")
+    private val HEADER_BG = Color.parseColor("#F2F2F2")
+    private val BORDER = Color.parseColor("#E7E7E7")
+
+    private fun forwardIntent(clazz: Class<*>): Intent {
+        val intent = Intent(this, clazz)
+        val path = getCurrentCsvPath()
+        if (!path.isNullOrBlank()) intent.putExtra(DataSource.EXTRA_CSV_FILE_PATH, path)
+        return intent
+    }
+
+    private fun getCurrentCsvPath(): String? {
+        val prefs = getSharedPreferences(DataSource.PREFS_NAME, MODE_PRIVATE)
+        return intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+            ?: prefs.getString(DataSource.KEY_CSV_FILE_PATH, null)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,167 +42,182 @@ class TargetAnalysisActivity : AppCompatActivity() {
 
         setupNavigation()
         loadCsv()
+        setupToggle()
         runTargetAnalysis()
     }
 
-    // -------------------- 1) 네비게이션 --------------------
+    private fun dp(v: Int): Int =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v.toFloat(), resources.displayMetrics).roundToInt()
+
+    private fun Double.format1(): String = String.format("%.1f", this)
+    private fun Double.format3(): String = String.format("%.3f", this)
+
     private fun setupNavigation() {
         findViewById<Button>(R.id.btnNavColumnStats).setOnClickListener {
-            startActivity(Intent(this, ColumnStatsActivity::class.java))
+            startActivity(forwardIntent(ColumnStatsActivity::class.java))
+            finish()
         }
         findViewById<Button>(R.id.btnNavDataQuality).setOnClickListener {
-            startActivity(Intent(this, DataQualityActivity::class.java))
+            startActivity(forwardIntent(DataQualityActivity::class.java))
+            finish()
         }
         findViewById<Button>(R.id.btnNavHistogram).setOnClickListener {
-            startActivity(Intent(this, HistogramActivity::class.java))
+            startActivity(forwardIntent(HistogramActivity::class.java))
+            finish()
         }
         findViewById<Button>(R.id.btnNavTargetAnalysis).setOnClickListener {
-            // 현재 페이지
+            // current
         }
     }
 
-    // -------------------- 2) CSV 로드 --------------------
-    private fun loadCsv() {
-        val inputStream = resources.openRawResource(R.raw.iris)
-        val lines = inputStream.bufferedReader().use { it.readLines() }
+    private fun setupToggle() {
+        val toggle = findViewById<TextView>(R.id.tvToggleConfusion)
+        val scroll = findViewById<HorizontalScrollView>(R.id.scrollConfusion)
 
-        header = lines.first().split(",")
-        rows = lines.drop(1)
-            .filter { it.isNotBlank() }
-            .map { it.split(",") }
+        scroll.visibility = View.VISIBLE
+        toggle.text = "Hide"
+
+        toggle.setOnClickListener {
+            val visible = scroll.visibility == View.VISIBLE
+            scroll.visibility = if (visible) View.GONE else View.VISIBLE
+            toggle.text = if (visible) "Show" else "Hide"
+        }
     }
 
-    // -------------------- 3) 타깃 기반 분석 실행 --------------------
+    private fun loadCsv() {
+        val intentPath = intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+        val lines = CsvLoader.loadLines(this, intentPath)
+
+        header = CsvLoader.splitCsvLine(lines.first()).map { it.trim().trim('"') }
+        rows = lines.drop(1)
+            .filter { it.isNotBlank() }
+            .map { line -> CsvLoader.splitCsvLine(line).map { it.trim().trim('"') } }
+    }
+
     private fun runTargetAnalysis() {
         val tvOverview = findViewById<TextView>(R.id.tvTargetOverview)
         val tvInsight = findViewById<TextView>(R.id.tvInsight)
 
-        // 1) 타깃 이름 로드
-        val prefs = getSharedPreferences("autoeda_prefs", MODE_PRIVATE)
+        val k1Label = findViewById<TextView>(R.id.tvKpi1Label)
+        val k1Value = findViewById<TextView>(R.id.tvKpi1Value)
+        val k2Label = findViewById<TextView>(R.id.tvKpi2Label)
+        val k2Value = findViewById<TextView>(R.id.tvKpi2Value)
+        val k3Label = findViewById<TextView>(R.id.tvKpi3Label)
+        val k3Value = findViewById<TextView>(R.id.tvKpi3Value)
+        val k4Label = findViewById<TextView>(R.id.tvKpi4Label)
+        val k4Value = findViewById<TextView>(R.id.tvKpi4Value)
+
+        val classDistContainer = findViewById<LinearLayout>(R.id.layoutClassDist)
+        val tableConf = findViewById<TableLayout>(R.id.tableConfusion)
+
+        val prefs = getSharedPreferences(DataSource.PREFS_NAME, MODE_PRIVATE)
         val targetName = prefs.getString("target_column", null)
 
         if (targetName.isNullOrBlank() || !header.contains(targetName)) {
             tvOverview.text =
-                "Target analysis overview\n\n" +
-                        "아직 타깃 컬럼이 설정되지 않았거나,\n" +
-                        "현재 데이터셋에서 해당 컬럼을 찾을 수 없습니다.\n\n" +
-                        "Column Statistics 화면에서 타깃 컬럼을 선택 후 Set 버튼을 눌러주세요."
-            tvInsight.text = ""
+                "No target selected.\n\nGo to Column Statistics → select a target column → tap Set.\n\n" +
+                        "• Categorical target → Classification\n• Numeric target → Regression"
+            tvInsight.text = "Pick a target first. Then we’ll run a baseline model automatically."
+
+            k1Label.text = "Accuracy"; k1Value.text = "—"
+            k2Label.text = "Macro F1";  k2Value.text = "—"
+            k3Label.text = "Rows used"; k3Value.text = "—"
+            k4Label.text = "Features";  k4Value.text = "—"
+
+            classDistContainer.removeAllViews()
+            tableConf.removeAllViews()
             return
         }
 
         val targetIdx = header.indexOf(targetName)
 
-        // 2) 타깃 타입 판별 (numeric / categorical)
-        val rawValues = rows.mapNotNull { it.getOrNull(targetIdx)?.trim() }
-            .filter { it.isNotEmpty() }
-
+        val rawValues = rows.mapNotNull { it.getOrNull(targetIdx)?.trim() }.filter { it.isNotEmpty() }
         val numericValues = rawValues.mapNotNull { it.toDoubleOrNull() }
         val isNumeric = numericValues.size >= rawValues.size * 0.5
 
         if (isNumeric) {
-            runNumericTargetOverview(targetName, tvOverview, tvInsight)
-        } else {
-            runCategoricalTargetAnalysis(targetName, targetIdx, tvOverview, tvInsight)
+            val y = numericValues
+            val yMean = y.average()
+            val errors = y.map { it - yMean }
+            val mae = errors.map { abs(it) }.average()
+            val rmse = sqrt(errors.map { it * it }.average())
+
+            val sst = y.sumOf { (it - yMean) * (it - yMean) }
+            val sse = sst
+            val r2 = if (sst > 0) 1.0 - (sse / sst) else 0.0
+
+            tvOverview.text = "$targetName (numeric)\n\nBaseline: Mean Predictor (naive)\nMetrics: RMSE / MAE / R²"
+            k1Label.text = "RMSE";      k1Value.text = rmse.format3()
+            k2Label.text = "MAE";       k2Value.text = mae.format3()
+            k3Label.text = "Rows used"; k3Value.text = y.size.toString()
+            k4Label.text = "Target mean"; k4Value.text = yMean.format3()
+
+            classDistContainer.removeAllViews()
+            tableConf.removeAllViews()
+
+            tvInsight.text =
+                "This is a very simple regression baseline.\n" +
+                        "Next upgrades: train/test split, Linear Regression, residual plot.\n" +
+                        "Current R² = ${r2.format3()} (mean predictor baseline)."
+            return
         }
-    }
 
-    // -------------------- 4) Numeric 타깃 개요 (stub) --------------------
-    private fun runNumericTargetOverview(
-        targetName: String,
-        tvOverview: TextView,
-        tvInsight: TextView
-    ) {
         tvOverview.text =
-            "Target analysis overview\n\n" +
-                    "현재 선택된 타깃 컬럼은 '$targetName' (numeric, 연속형) 입니다.\n\n" +
-                    "이 경우에는 회귀(regression) 문제로 볼 수 있으며,\n" +
-                    "기본적으로는 RMSE, MAE, R² 등의 지표를 이용해\n" +
-                    "예측 성능을 평가할 수 있습니다.\n\n" +
-                    "지금 버전에서는 numeric 타깃에 대한\n" +
-                    "기본 회귀 모델/시각화는 추후 추가될 예정입니다."
+            "$targetName (categorical)\n\nBaseline: k-NN (k=3) using numeric features\nEvaluation: Leave-one-out (LOO)"
 
-        tvInsight.text = "Numeric 타깃에 대한 자세한 회귀 분석 기능은 추후 업데이트 예정입니다."
-    }
-
-    // -------------------- 5) Categorical 타깃 + k-NN confusion matrix --------------------
-    private fun runCategoricalTargetAnalysis(
-        targetName: String,
-        targetIdx: Int,
-        tvOverview: TextView,
-        tvInsight: TextView
-    ) {
-        tvOverview.text =
-            "Target analysis overview\n\n" +
-                    "현재 선택된 타깃 컬럼은 '$targetName' (categorical, 범주형) 입니다.\n\n" +
-                    "이 타깃은 분류(classification) 문제로 볼 수 있으며,\n" +
-                    "여기서는 모든 numeric 피처를 이용한 간단한 k-NN (k=3) 모델로\n" +
-                    "기본 예측 성능을 평가합니다.\n\n" +
-                    "아래 인사이트 카드에는 클래스 분포와 함께\n" +
-                    "k-NN 기반 confusion matrix, 정확도(accuracy),\n" +
-                    "macro F1 점수가 표시됩니다."
-
-        // 1) 사용할 numeric 피처 인덱스 선택 (타깃 제외)
         val numericFeatureIdx = header.indices.filter { idx ->
             if (idx == targetIdx) return@filter false
             val vals = rows.mapNotNull { it.getOrNull(idx)?.trim() }
             val nums = vals.mapNotNull { it.toDoubleOrNull() }
-            nums.size >= vals.size * 0.5 && nums.isNotEmpty()
+            nums.isNotEmpty() && nums.size >= vals.size * 0.5
         }
 
         if (numericFeatureIdx.isEmpty()) {
-            tvInsight.text =
-                "사용 가능한 numeric 피처가 없어 간단한 분류 모델을 실행할 수 없습니다.\n" +
-                        "다른 데이터셋이나 타깃 컬럼을 선택해 보세요."
+            tvInsight.text = "No numeric features available → cannot run baseline classifier."
+            k1Value.text = "—"; k2Value.text = "—"; k3Value.text = "—"; k4Value.text = "—"
+            classDistContainer.removeAllViews()
+            tableConf.removeAllViews()
             return
         }
 
-        // 2) 피처 행렬 X, 레이블 y 구성
-        val X = mutableListOf<DoubleArray>()
+        val Xraw = mutableListOf<DoubleArray>()
         val y = mutableListOf<String>()
 
         for (row in rows) {
-            if (row.size <= targetIdx) continue
-            val label = row[targetIdx].trim()
+            val label = row.getOrNull(targetIdx)?.trim().orEmpty()
             if (label.isEmpty()) continue
 
             val feats = DoubleArray(numericFeatureIdx.size)
             var ok = true
             numericFeatureIdx.forEachIndexed { j, colIdx ->
                 val v = row.getOrNull(colIdx)?.trim()?.toDoubleOrNull()
-                if (v == null) {
-                    ok = false
-                    return@forEachIndexed
-                } else {
-                    feats[j] = v
-                }
+                if (v == null) ok = false else feats[j] = v
             }
             if (ok) {
-                X.add(feats)
+                Xraw.add(feats)
                 y.add(label)
             }
         }
 
-        val n = X.size
+        val n = Xraw.size
         if (n < 2) {
-            tvInsight.text = "유효한 행(row)이 너무 적어 분류 모델을 학습할 수 없습니다."
+            tvInsight.text = "Not enough valid rows to evaluate."
             return
         }
 
-        // 3) 클래스 목록 및 confusion matrix 준비
+        val X = zScoreScale(Xraw)
+
         val classes = y.distinct().sorted()
         val classToIdx = classes.withIndex().associate { it.value to it.index }
-        val k = classes.size
-        val conf = Array(k) { IntArray(k) }
+        val kClass = classes.size
+        val conf = Array(kClass) { IntArray(kClass) }
 
-        // 4) 간단한 leave-one-out k-NN (k=3)
         val kNeighbors = 3
 
         for (i in 0 until n) {
             val xi = X[i]
-
-            // 다른 샘플들과 거리 계산
             val distances = mutableListOf<Pair<Int, Double>>()
+
             for (j in 0 until n) {
                 if (j == i) continue
                 val xj = X[j]
@@ -191,89 +229,155 @@ class TargetAnalysisActivity : AppCompatActivity() {
                 distances.add(j to dist)
             }
 
-            // 거리 순 정렬 후 k개 이웃
             val neighbors = distances.sortedBy { it.second }
                 .take(kNeighbors)
                 .map { (idx, _) -> y[idx] }
 
-            // 다수결로 예측
-            val predLabel = neighbors
-                .groupingBy { it }
-                .eachCount()
-                .maxByOrNull { it.value }!!
-                .key
+            val predLabel = neighbors.groupingBy { it }.eachCount().maxByOrNull { it.value }!!.key
 
             val trueIdx = classToIdx[y[i]]!!
             val predIdx = classToIdx[predLabel]!!
             conf[trueIdx][predIdx] += 1
         }
 
-        // 5) 성능 지표 계산 (accuracy, macro F1)
         var correct = 0
-        for (c in 0 until k) correct += conf[c][c]
+        for (c in 0 until kClass) correct += conf[c][c]
         val accuracy = correct.toDouble() / n.toDouble()
 
         var f1Sum = 0.0
-        for (c in 0 until k) {
+        for (c in 0 until kClass) {
             val tp = conf[c][c].toDouble()
-            val fp = (0 until k).sumOf { r ->
-                if (r == c) 0 else conf[r][c]
-            }.toDouble()
-            val fn = (0 until k).sumOf { r ->
-                if (r == c) 0 else conf[c][r]
-            }.toDouble()
+            val fp = (0 until kClass).sumOf { r -> if (r == c) 0 else conf[r][c] }.toDouble()
+            val fn = (0 until kClass).sumOf { r -> if (r == c) 0 else conf[c][r] }.toDouble()
 
             val precision = if (tp + fp > 0) tp / (tp + fp) else 0.0
             val recall = if (tp + fn > 0) tp / (tp + fn) else 0.0
             val f1 = if (precision + recall > 0) 2 * precision * recall / (precision + recall) else 0.0
             f1Sum += f1
         }
-        val macroF1 = f1Sum / k.toDouble()
+        val macroF1 = f1Sum / kClass.toDouble()
 
-        // 6) 클래스 분포 계산
-        val classCounts = y.groupingBy { it }.eachCount()
-        val distText = classes.joinToString("\n") { cls ->
-            val cnt = classCounts[cls] ?: 0
-            val ratio = cnt.toDouble() / n.toDouble() * 100.0
-            "• $cls: $cnt (${ratio.format1()}%)"
-        }
+        k1Label.text = "Accuracy"
+        k2Label.text = "Macro F1"
+        k3Label.text = "Rows used"
+        k4Label.text = "Features"
 
-        // 7) confusion matrix 텍스트로 정리
-        val sb = StringBuilder()
-        sb.append("🔍 Categorical 타깃 기본 분류 분석\n\n")
-        sb.append("• 타깃: $targetName\n")
-        sb.append("• 클래스 개수: ${classes.size}\n")
-        sb.append("• 사용 피처 개수: ${numericFeatureIdx.size}\n\n")
+        k1Value.text = "${(accuracy * 100).format1()}%"
+        k2Value.text = macroF1.format3()
+        k3Value.text = n.toString()
+        k4Value.text = numericFeatureIdx.size.toString()
 
-        sb.append("클래스 분포:\n$distText\n\n")
+        renderClassDistribution(classDistContainer, classes, y)
+        renderConfusionTable(tableConf, classes, conf)
 
-        sb.append("Confusion matrix (행 = 실제, 열 = 예측):\n")
-
-        // 헤더
-        sb.append(String.format("%10s", ""))
-        for (cls in classes) {
-            sb.append(String.format("%10s", cls))
-        }
-        sb.append("\n")
-
-        for ((iCls, cls) in classes.withIndex()) {
-            sb.append(String.format("%10s", cls))
-            for (j in 0 until k) {
-                sb.append(String.format("%10d", conf[iCls][j]))
-            }
-            sb.append("\n")
-        }
-
-        sb.append("\n")
-        sb.append("Accuracy: ${(accuracy * 100).format1()}%\n")
-        sb.append("Macro F1: ${macroF1.format3()}\n\n")
-        sb.append("※ 이 결과는 매우 단순한 k-NN(leave-one-out) 기반 기준선(baseline)입니다.\n")
-        sb.append("   실제 분석에서는 더 복잡한 모델과 교차검증을 함께 사용하는 것이 좋습니다.")
-
-        tvInsight.text = sb.toString()
+        tvInsight.text =
+            "Baseline ready (k-NN, k=3, LOO).\n" +
+                    "• If Accuracy is low: try different k, add scaling, or use train/test split.\n" +
+                    "• Next upgrades: per-class precision/recall, ROC/PR (binary), cross-validation."
     }
 
-    // -------------------- 6) Double 포맷 helper --------------------
-    private fun Double.format1(): String = String.format("%.1f", this)
-    private fun Double.format3(): String = String.format("%.3f", this)
+    private fun zScoreScale(X: List<DoubleArray>): List<DoubleArray> {
+        if (X.isEmpty()) return X
+        val d = X[0].size
+        val n = X.size
+
+        val means = DoubleArray(d)
+        val stds = DoubleArray(d)
+
+        for (j in 0 until d) means[j] = X.sumOf { it[j] } / n.toDouble()
+        for (j in 0 until d) {
+            val m = means[j]
+            val varr = X.sumOf { (it[j] - m) * (it[j] - m) } / max(1, n - 1).toDouble()
+            stds[j] = sqrt(varr).coerceAtLeast(1e-9)
+        }
+
+        return X.map { row -> DoubleArray(d) { j -> (row[j] - means[j]) / stds[j] } }
+    }
+
+    private fun renderClassDistribution(container: LinearLayout, classes: List<String>, y: List<String>) {
+        container.removeAllViews()
+        val total = y.size.toDouble().coerceAtLeast(1.0)
+        val counts = y.groupingBy { it }.eachCount()
+
+        classes.forEach { cls ->
+            val cnt = counts[cls] ?: 0
+            val ratio = cnt / total
+
+            val block = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(10), 0, dp(10))
+            }
+
+            val top = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+
+            val tvName = TextView(this).apply {
+                text = cls
+                textSize = 16f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(TEXT_DARK)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+
+            val tvRight = TextView(this).apply {
+                text = "$cnt · ${(ratio * 100).format1()}%"
+                textSize = 15f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(TEXT_DARK)
+            }
+
+            val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = 1000
+                progress = (ratio * 1000).roundToInt().coerceIn(0, 1000)
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(14)).apply {
+                    topMargin = dp(8)
+                }
+                progressTintList = ColorStateList.valueOf(BLUE)
+                progressBackgroundTintList = ColorStateList.valueOf(BLUE_SOFT)
+            }
+
+            val divider = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1)).apply {
+                    topMargin = dp(12)
+                }
+                setBackgroundColor(BORDER)
+            }
+
+            top.addView(tvName)
+            top.addView(tvRight)
+            block.addView(top)
+            block.addView(bar)
+            block.addView(divider)
+            container.addView(block)
+        }
+    }
+
+    private fun renderConfusionTable(table: TableLayout, classes: List<String>, conf: Array<IntArray>) {
+        table.removeAllViews()
+
+        val headerRow = TableRow(this)
+        headerRow.addView(makeCell("", true))
+        classes.forEach { headerRow.addView(makeCell(it, true)) }
+        table.addView(headerRow)
+
+        for (i in classes.indices) {
+            val tr = TableRow(this)
+            tr.addView(makeCell(classes[i], true))
+            for (j in classes.indices) tr.addView(makeCell(conf[i][j].toString(), false))
+            table.addView(tr)
+        }
+    }
+
+    private fun makeCell(text: String, header: Boolean): TextView =
+        TextView(this).apply {
+            this.text = text
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            setTextColor(TEXT_DARK)
+            if (header) setBackgroundColor(HEADER_BG)
+        }
 }

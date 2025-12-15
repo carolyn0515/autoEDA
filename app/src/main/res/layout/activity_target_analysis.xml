@@ -2,22 +2,23 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@android:color/white">
+    android:background="#FAFAFA"
+    android:clipToPadding="false"
+    android:paddingBottom="18dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="18dp">
 
-        <!-- ====== 상단 앱바 ====== -->
+        <!-- ===== 상단 앱바 ===== -->
         <ImageView
             android:id="@+id/ivTopLogo"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/logo"
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,13 +30,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:text="Auto EDA"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="#111111"
             app:layout_constraintStart_toEndOf="@id/ivTopLogo"
             app:layout_constraintTop_toTopOf="@id/ivTopLogo"
             app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"/>
 
-        <!-- ====== 네비게이션 2x2 (LinearLayout로 정렬) ====== -->
+        <!-- ===== 네비게이션 ===== -->
         <LinearLayout
             android:id="@+id/layoutNav"
             android:layout_width="0dp"
@@ -46,10 +48,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- 1행: Column / Data Quality -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="56dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -58,30 +59,29 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="Column Statistics"
-                    android:textAllCaps="false"
-                    android:textColor="#444"
+                    android:textSize="16sp"
                     android:textStyle="bold"
+                    android:textAllCaps="false"
                     android:background="@drawable/rounded_gray_button"/>
 
                 <Button
                     android:id="@+id/btnNavDataQuality"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
                     android:text="Data Quality"
-                    android:textAllCaps="false"
-                    android:textColor="#444"
+                    android:textSize="16sp"
                     android:textStyle="bold"
+                    android:textAllCaps="false"
                     android:background="@drawable/rounded_gray_button"/>
             </LinearLayout>
 
-            <!-- 2행: Histogram / Target Analysis -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:layout_height="56dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnNavHistogram"
@@ -89,92 +89,381 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="Histogram"
-                    android:textAllCaps="false"
-                    android:textColor="#444"
+                    android:textSize="16sp"
                     android:textStyle="bold"
+                    android:textAllCaps="false"
                     android:background="@drawable/rounded_gray_button"/>
 
                 <Button
                     android:id="@+id/btnNavTargetAnalysis"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
                     android:text="Target Analysis"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
-                    android:textStyle="bold"
                     android:background="@drawable/rounded_blue_button"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ====== Target 설명 카드 ====== -->
+        <!-- ===== Overview Card ===== -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardOverview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="22dp"
             app:layout_constraintTop_toBottomOf="@id/layoutNav"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp">
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/white">
 
-            <TextView
-                android:id="@+id/tvTargetOverview"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:textSize="13sp"
-                android:textColor="#333333"
-                android:lineSpacingExtra="4dp"
-                tools:text="Target analysis overview\n\n현재 선택된 타겟 컬럼은 'Species' (categorical) 입니다.\n...\n"/>
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Target Overview"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#111111"/>
+
+                <TextView
+                    android:id="@+id/tvTargetOverview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="#333333"
+                    android:text="—"/>
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- ====== (추후) 모델 결과 / 시각화 카드 ====== -->
+        <!-- ===== KPI Card (2x2) ===== -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardPlot"
+            android:id="@+id/cardKpi"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/cardOverview"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
             app:cardElevation="0dp"
-            app:cardCornerRadius="0dp"/>
+            app:cardBackgroundColor="@android:color/white">
 
-        <!-- ====== Insight 카드 ====== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Key Metrics"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#111111"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <!-- KPI 1 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:background="#F6F8FF">
+
+                        <TextView
+                            android:id="@+id/tvKpi1Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Accuracy"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"/>
+
+                        <TextView
+                            android:id="@+id/tvKpi1Value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"
+                            android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+
+                    <!-- KPI 2 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:background="#F6F8FF">
+
+                        <TextView
+                            android:id="@+id/tvKpi2Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Macro F1"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"/>
+
+                        <TextView
+                            android:id="@+id/tvKpi2Value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"
+                            android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <!-- KPI 3 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:background="#F6F8FF">
+
+                        <TextView
+                            android:id="@+id/tvKpi3Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rows used"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"/>
+
+                        <TextView
+                            android:id="@+id/tvKpi3Value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"
+                            android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+
+                    <!-- KPI 4 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:background="#F6F8FF">
+
+                        <TextView
+                            android:id="@+id/tvKpi4Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Features"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"/>
+
+                        <TextView
+                            android:id="@+id/tvKpi4Value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"
+                            android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== Class Distribution Card ===== -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardClassDist"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:layout_constraintTop_toBottomOf="@id/cardKpi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Class Distribution"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#111111"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutClassDist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== Confusion Matrix Card ===== -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardConfusion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:layout_constraintTop_toBottomOf="@id/cardClassDist"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Confusion Matrix"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#111111"/>
+
+                    <!-- 토글 텍스트 (반드시 width/height 있어야 함) -->
+                    <TextView
+                        android:id="@+id/tvToggleConfusion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hide"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#1E63FF"/>
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:id="@+id/scrollConfusion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:visibility="visible">
+
+                    <TableLayout
+                        android:id="@+id/tableConfusion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Rows = actual, Columns = predicted"
+                    android:textSize="14sp"
+                    android:textColor="#666666"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== Insight Card ===== -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardInsight"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/cardPlot"
+            android:layout_marginTop="14dp"
+            app:layout_constraintTop_toBottomOf="@id/cardConfusion"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#FFF7D6">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
-                android:background="#FFF7D6">
+                android:padding="18dp"
+                android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@android:drawable/ic_dialog_info"/>
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@android:drawable/ic_dialog_info"
+                    android:contentDescription="info"/>
 
                 <TextView
                     android:id="@+id/tvInsight"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Insight will appear here"
-                    android:textColor="#333"
-                    android:textSize="14sp"/>
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="—"
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="4dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -11,15 +10,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <!-- 상단 앱바 -->
         <ImageView
             android:id="@+id/ivTopLogo"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/logo"
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,25 +29,25 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:text="Auto EDA"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/ivTopLogo"
             app:layout_constraintTop_toTopOf="@id/ivTopLogo"
             app:layout_constraintBottom_toBottomOf="@id/ivTopLogo" />
 
-
-        <!-- 네비 버튼: Histogram 강조 (2 x 2) -->
+        <!-- 네비 버튼 -->
         <Button
             android:id="@+id/btnNavColumnStats"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="24dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Column Statistics"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnNavDataQuality"
@@ -58,14 +56,15 @@
         <Button
             android:id="@+id/btnNavDataQuality"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Data Quality"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toTopOf="@id/btnNavColumnStats"
             app:layout_constraintBottom_toBottomOf="@id/btnNavColumnStats"
             app:layout_constraintStart_toEndOf="@id/btnNavColumnStats"
@@ -75,46 +74,44 @@
         <Button
             android:id="@+id/btnNavHistogram"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/rounded_blue_button"
             android:text="Histogram"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toBottomOf="@id/btnNavColumnStats"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnNavTargetAnalysis"
             app:layout_constraintHorizontal_weight="1" />
 
-
-        <!-- Select Column -->
-
         <Button
             android:id="@+id/btnNavTargetAnalysis"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/rounded_gray_button"
             android:text="Target Analysis"
             android:textAllCaps="false"
             android:textColor="#444444"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/btnNavHistogram"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@id/btnNavHistogram"
+            android:paddingVertical="10dp"
             app:layout_constraintTop_toTopOf="@id/btnNavHistogram"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintBottom_toBottomOf="@id/btnNavHistogram"
+            app:layout_constraintStart_toEndOf="@id/btnNavHistogram"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
 
+        <!-- Select Column 카드 (id 추가됨) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardSelectColumn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="28dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/btnNavHistogram"
@@ -124,36 +121,48 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/card_rounded_border"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:background="@drawable/card_rounded_border"
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Select Column"
-                    android:textSize="14sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Choose a column to visualize its distribution"
+                    android:textSize="15sp"
+                    android:textColor="#555555" />
 
                 <AutoCompleteTextView
                     android:id="@+id/actvHistogramColumn"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:color/transparent"
-                    android:completionThreshold="1"
-                    android:hint="Choose column"
-                    android:inputType="none" />
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:hint="Tap to choose"
+                    android:textSize="17sp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:inputType="none"
+                    android:background="@drawable/card_rounded_border"
+                    android:dropDownHeight="wrap_content"
+                    android:dropDownWidth="match_parent"
+                    android:completionThreshold="0"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <!-- Numerical bin size -->
+        <!-- Bin 옵션 카드 (있으면 유지, Kotlin에서 hide/show 가능) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardBinOption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="18dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/cardSelectColumn"
@@ -164,36 +173,48 @@
                 android:id="@+id/layoutBinOption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/card_rounded_border"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:visibility="gone">
+                android:background="@drawable/card_rounded_border"
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bin Size (numeric data)"
-                    android:textSize="14sp"
+                    android:text="Bin Size"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Adjust how detailed the histogram is"
+                    android:textSize="15sp"
+                    android:textColor="#555555" />
 
                 <AutoCompleteTextView
                     android:id="@+id/actvBinSize"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Select bin size"
-                    android:inputType="none" />
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:hint="Tap to choose"
+                    android:textSize="17sp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:inputType="none"
+                    android:background="@drawable/card_rounded_border"
+                    android:dropDownHeight="wrap_content"
+                    android:dropDownWidth="match_parent"
+                    android:completionThreshold="0"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <!-- Histogram Chart -->
+        <!-- Histogram 카드 (id 추가됨) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardHistogram"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="22dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/cardBinOption"
@@ -201,35 +222,93 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
-                android:id="@+id/layoutHistogramBars"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/card_rounded_border"
                 android:orientation="vertical"
-                android:padding="12dp" />
+                android:background="@drawable/card_rounded_border"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Histogram"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Frequency distribution"
+                    android:textSize="15sp"
+                    android:textColor="#555555" />
+
+                <LinearLayout
+                    android:id="@+id/layoutHistogramBars"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:orientation="vertical" />
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <!-- Ratio Table -->
+        <!-- Value Ratio 카드 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardRatioTable"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="22dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/cardHistogram"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <TableLayout
-                android:id="@+id/tableValueRatio"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:background="@drawable/card_rounded_border"
-                android:padding="12dp"
-                android:stretchColumns="0,1,2" />
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Value Ratio"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Top values and their ratios"
+                    android:textSize="15sp"
+                    android:textColor="#555555" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:scrollbars="none">
+
+                    <TableLayout
+                        android:id="@+id/tableValueRatio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*"
+                        android:shrinkColumns="*" />
+                </HorizontalScrollView>
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <!-- 하단 여백 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            app:layout_constraintTop_toBottomOf="@id/cardRatioTable"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

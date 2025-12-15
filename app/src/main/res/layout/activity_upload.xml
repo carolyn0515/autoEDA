@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
@@ -10,43 +11,105 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <!-- 상단 앱바: 좌측 로고 + Auto EDA 텍스트 -->
+        <!-- 상단 앱바 -->
+        <TextView
+            android:id="@+id/tvTopTitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Auto EDA"
+            android:textColor="#111111"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toEndOf="@id/ivTopLogo"
+            app:layout_constraintTop_toTopOf="@id/ivTopLogo" />
+
         <ImageView
             android:id="@+id/ivTopLogo"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/logo"
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Data Badge -->
         <TextView
-            android:id="@+id/tvTopTitle"
+            android:id="@+id/tvDataBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Auto EDA"
-            android:textSize="22sp"
+            android:background="@drawable/bg_badge"
+            android:paddingLeft="10dp"
+            android:paddingTop="6dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="6dp"
+            android:text="FILE (Not selected)"
+            android:textColor="#1E63FF"
+            android:textSize="13sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/ivTopLogo"
-            app:layout_constraintBottom_toBottomOf="@id/ivTopLogo"
-            app:layout_constraintStart_toEndOf="@id/ivTopLogo" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp" />
 
-        <!-- 업로드 박스 -->
+        <!-- Data Source 선택 -->
+        <TextView
+            android:id="@+id/tvDataSourceTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="Data Source"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#444444"
+            app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/rgDataSource"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/tvDataSourceTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <RadioButton
+                android:id="@+id/rbSourceFile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="File Upload"
+                android:checked="true"
+                android:textColor="#444444"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/rbSourceApi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="API (Key)"
+                android:textColor="#444444"
+                android:textStyle="bold" />
+        </RadioGroup>
+
+        <!-- 파일 업로드 카드 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/layoutFileField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="18dp"
             android:clickable="true"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/ivTopLogo"
+            app:layout_constraintTop_toBottomOf="@id/rgDataSource"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -54,32 +117,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp"
+                android:padding="22dp"
                 android:background="@drawable/card_rounded_border">
 
                 <TextView
                     android:id="@+id/tvUploadLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Upload CSV/XLSX/ZIP File"
-                    android:textColor="#555555"
-                    android:textSize="14sp"
+                    android:text="Upload CSV File"
+                    android:textColor="#444444"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/fileNameContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_height="64dp"
+                    android:layout_marginTop="12dp">
 
                     <TextView
                         android:id="@+id/etFileName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="Choose a file"
+                        android:text="Choose a CSV file"
                         android:textColor="#999999"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/btnClearFile"
                         app:layout_constraintTop_toTopOf="parent"
@@ -87,8 +152,8 @@
 
                     <ImageButton
                         android:id="@+id/btnClearFile"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:background="@android:color/transparent"
                         android:contentDescription="Clear file"
                         android:src="@android:drawable/ic_menu_close_clear_cancel"
@@ -99,48 +164,291 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Start EDA / Download result 버튼 -->
+        <!-- API 입력 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layoutApiField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/rgDataSource"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="22dp"
+                android:background="@drawable/card_rounded_border">
+
+                <TextView
+                    android:id="@+id/tvApiLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Load data via API key"
+                    android:textColor="#444444"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Provider -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="API Provider"
+                    android:textColor="#666666"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spApiProvider"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="12dp"
+                    android:background="@drawable/card_rounded_border" />
+
+                <!-- Service Key -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Service Key"
+                    android:textColor="#666666"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etServiceKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/card_rounded_border"
+                    android:paddingHorizontal="12dp"
+                    android:hint="Paste your API key"
+                    android:textColor="#222222"
+                    android:textColorHint="#999999"
+                    android:inputType="textNoSuggestions"
+                    android:maxLines="1" />
+
+                <!-- LAWD_CD / DEAL_YMD -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="LAWD_CD"
+                            android:textColor="#666666"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/etLawdCd"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/card_rounded_border"
+                            android:paddingHorizontal="12dp"
+                            android:hint="e.g. 11110"
+                            android:textColor="#222222"
+                            android:textColorHint="#999999"
+                            android:inputType="number"
+                            android:maxLines="1" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="12dp"
+                        android:layout_height="1dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DEAL_YMD"
+                            android:textColor="#666666"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/etDealYmd"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/card_rounded_border"
+                            android:paddingHorizontal="12dp"
+                            android:hint="YYYYMM (e.g. 202512)"
+                            android:textColor="#222222"
+                            android:textColorHint="#999999"
+                            android:inputType="number"
+                            android:maxLines="1" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- numOfRows / pageNo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="numOfRows"
+                            android:textColor="#666666"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/etNumOfRows"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/card_rounded_border"
+                            android:paddingHorizontal="12dp"
+                            android:hint="e.g. 200"
+                            android:textColor="#222222"
+                            android:textColorHint="#999999"
+                            android:inputType="number"
+                            android:maxLines="1" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="12dp"
+                        android:layout_height="1dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="pageNo"
+                            android:textColor="#666666"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/etPageNo"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/card_rounded_border"
+                            android:paddingHorizontal="12dp"
+                            android:hint="e.g. 1"
+                            android:textColor="#222222"
+                            android:textColorHint="#999999"
+                            android:inputType="number"
+                            android:maxLines="1" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- API buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnTestApi"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_gray_button"
+                        android:text="Test"
+                        android:textAllCaps="false"
+                        android:textColor="#444444"
+                        android:textStyle="bold" />
+
+                    <Space
+                        android:layout_width="12dp"
+                        android:layout_height="1dp" />
+
+                    <Button
+                        android:id="@+id/btnLoadApi"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_blue_button"
+                        android:text="Load &amp; Analyze"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvApiHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tip: Use presets for demo (e.g. LAWD_CD=11110, DEAL_YMD=202512)"
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Barrier -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierDataSourceBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="layoutFileField,layoutApiField" />
+
+        <!-- Start 버튼만 남김 -->
         <Button
             android:id="@+id/btnStartEda"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/rounded_blue_button"
             android:text="Start EDA"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/layoutFileField"
+            android:paddingVertical="10dp"
+            app:layout_constraintTop_toBottomOf="@id/barrierDataSourceBottom"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnDownloadResult"
-            app:layout_constraintHorizontal_weight="1" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
-            android:id="@+id/btnDownloadResult"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/rounded_gray_button"
-            android:text="Download result"
-            android:textAllCaps="false"
-            android:textColor="#444444"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/btnStartEda"
-            app:layout_constraintBottom_toBottomOf="@id/btnStartEda"
-            app:layout_constraintStart_toEndOf="@id/btnStartEda"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="1" />
-
-        <!-- Overview 타이틀 -->
+        <!-- Overview -->
         <TextView
             android:id="@+id/tvOverviewTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="36dp"
             android:text="Overview"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/btnStartEda"
             app:layout_constraintStart_toStartOf="parent" />
@@ -149,8 +457,8 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardRows"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="16dp"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
@@ -163,23 +471,25 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center_vertical"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:background="@drawable/card_rounded_border">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Rows"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#444444" />
 
                 <TextView
                     android:id="@+id/tvRowsValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="-"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -187,9 +497,9 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardColumns"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="12dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/tvOverviewTitle"
@@ -201,23 +511,25 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center_vertical"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:background="@drawable/card_rounded_border">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Columns"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#444444" />
 
                 <TextView
                     android:id="@+id/tvColumnsValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="-"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -225,8 +537,8 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardFileSize"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/cardRows"
@@ -238,36 +550,38 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:background="@drawable/card_rounded_border">
 
                 <ImageView
                     android:id="@+id/ivFileIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:src="@android:drawable/ic_menu_save" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="14dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="File Size"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#444444" />
 
                     <TextView
                         android:id="@+id/tvFileSizeValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -276,8 +590,8 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardNumeric"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="16dp"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
@@ -290,22 +604,25 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center_vertical"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:background="@drawable/card_rounded_border">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Numeric"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#444444" />
 
                 <TextView
                     android:id="@+id/tvNumericValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="-"
-                    android:textSize="14sp" />
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -313,9 +630,9 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardCategorical"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="12dp"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
@@ -328,40 +645,43 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center_vertical"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:background="@drawable/card_rounded_border">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Categorical"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#444444" />
 
                 <TextView
                     android:id="@+id/tvCategoricalValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="-"
-                    android:textSize="14sp" />
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- View Detailed Analysis 링크 텍스트 -->
+        <!-- View Detailed Analysis -->
         <TextView
             android:id="@+id/tvViewDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
             android:text="View Detailed Analysis →"
             android:textColor="#1E63FF"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:background="@drawable/card_rounded_border"
             app:layout_constraintTop_toBottomOf="@id/cardNumeric"
-            app:layout_constraintVertical_bias="0.196" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

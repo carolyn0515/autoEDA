@@ -2,104 +2,111 @@ package com.example.autoeda
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
-import android.widget.Toast
+import android.view.Gravity
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.setPadding
 
 class ColumnStatsActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_CSV_FILE_PATH = "extra_csv_file_path"
+    }
+
+    enum class ColKind { NUMERIC, CATEGORICAL, TEXT }
+
     data class ColumnStats(
         val name: String,
-        val isNumeric: Boolean,
+        val kind: ColKind,
         val mean: Double?,
         val std: Double?,
         val min: Double?,
         val max: Double?,
         val missingRatio: Double
-    )
+    ) {
+        val isNumeric: Boolean get() = kind == ColKind.NUMERIC
+    }
+
+    private fun forwardIntent(clazz: Class<*>): Intent {
+        val intent = Intent(this, clazz)
+        val path = getCurrentCsvPath()
+        if (!path.isNullOrBlank()) intent.putExtra(DataSource.EXTRA_CSV_FILE_PATH, path)
+        return intent
+    }
+
+    private fun getCurrentCsvPath(): String? {
+        val prefs = getSharedPreferences(DataSource.PREFS_NAME, MODE_PRIVATE)
+        // intent가 있으면 그걸 우선
+        return intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+            ?: prefs.getString(DataSource.KEY_CSV_FILE_PATH, null)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_column_stats)
 
-        // 🔵 네비게이션
         setupNavigation()
 
-        // 1) iris.csv 로드
-        val inputStream = resources.openRawResource(R.raw.iris)
-        val csvLines = inputStream.bufferedReader().use { it.readLines() }
-        if (csvLines.isEmpty()) return
+        // CSV 로드 (Intent or Prefs or Raw)
+        val intentPath = intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+        val lines = CsvLoader.loadLines(this, intentPath)
+        if (lines.isEmpty()) return
 
-        val header = csvLines.first().split(",")
-        val rows = csvLines
-            .drop(1)
+        val header = CsvLoader.splitCsvLine(lines.first()).map { it.trim().trim('"') }
+        val rows = lines.drop(1)
             .filter { it.isNotBlank() }
-            .map { it.split(",") }
+            .map { line -> CsvLoader.splitCsvLine(line).map { it.trim().trim('"') } }
 
-        // 2) 통계 계산
         val statsList = computeStats(header, rows)
 
-        // 3) 테이블 채우기
+        // 테이블 채우기
         val table = findViewById<TableLayout>(R.id.tableGeneralStats)
         while (table.childCount > 1) table.removeViewAt(1)
 
-        statsList.filter { it.isNumeric }.forEach { stat ->
+        statsList.filter { it.kind == ColKind.NUMERIC }.forEach { stat ->
             table.addView(makeRow(stat))
         }
 
-        // 4) Type Summary
-        val tvTypeSummary = findViewById<TextView>(R.id.tvTypeSummaryValues)
-        val numericCount = statsList.count { it.isNumeric }
-        val categoricalCount = statsList.count { !it.isNumeric }
-        tvTypeSummary.text =
-            "Numeric: $numericCount    Categorical: $categoricalCount    Text: 0"
+        // Type Summary (3카드)
+        val numericCount = statsList.count { it.kind == ColKind.NUMERIC }
+        val categoricalCount = statsList.count { it.kind == ColKind.CATEGORICAL }
+        val textCount = statsList.count { it.kind == ColKind.TEXT }
 
-        // 5) Target Column 설정 + SharedPreferences 저장
+        findViewById<TextView>(R.id.tvNumericCount).text = numericCount.toString()
+        findViewById<TextView>(R.id.tvCategoricalCount).text = categoricalCount.toString()
+        findViewById<TextView>(R.id.tvTextCount).text = textCount.toString()
+
         setupTargetSetButton(statsList)
     }
 
-    // 🔵 네비게이션 기능
     private fun setupNavigation() {
         findViewById<Button>(R.id.btnNavColumnStats).setOnClickListener {
-            // 현재 페이지
+            // current
         }
         findViewById<Button>(R.id.btnNavDataQuality).setOnClickListener {
-            startActivity(Intent(this, DataQualityActivity::class.java))
+            startActivity(forwardIntent(DataQualityActivity::class.java))
+            finish()
         }
         findViewById<Button>(R.id.btnNavHistogram).setOnClickListener {
-            startActivity(Intent(this, HistogramActivity::class.java))
+            startActivity(forwardIntent(HistogramActivity::class.java))
+            finish()
         }
         findViewById<Button>(R.id.btnNavTargetAnalysis).setOnClickListener {
-            startActivity(Intent(this, TargetAnalysisActivity::class.java))
+            startActivity(forwardIntent(TargetAnalysisActivity::class.java))
+            finish()
         }
     }
 
-    // 🔵 Target 컬럼 선택 & 타입 저장
     private fun setupTargetSetButton(statsList: List<ColumnStats>) {
         val actvTarget = findViewById<AutoCompleteTextView>(R.id.actvTargetColumn)
         val btnSetTarget = findViewById<Button>(R.id.btnSetTarget)
 
-        // 👉 numeric만이 아니라 모든 컬럼 이름 후보
         val targetCandidates = statsList.map { it.name }
-
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_dropdown_item_1line,
-            targetCandidates
-        )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, targetCandidates)
         actvTarget.setAdapter(adapter)
         actvTarget.threshold = 0
 
         actvTarget.setOnClickListener { actvTarget.showDropDown() }
-        actvTarget.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) actvTarget.showDropDown()
-        }
+        actvTarget.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) actvTarget.showDropDown() }
 
         btnSetTarget.setOnClickListener {
             val selected = actvTarget.text?.toString()?.trim()
@@ -108,44 +115,35 @@ class ColumnStatsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 선택한 컬럼의 타입 찾기
             val stat = statsList.firstOrNull { it.name == selected }
-            val targetType = if (stat?.isNumeric == true) "numeric" else "categorical"
+            val targetType = if (stat?.kind == ColKind.NUMERIC) "numeric" else "categorical"
 
-            // SharedPreferences에 저장
-            val prefs = getSharedPreferences("autoeda_prefs", MODE_PRIVATE)
+            val prefs = getSharedPreferences(DataSource.PREFS_NAME, MODE_PRIVATE)
             prefs.edit()
                 .putString("target_column", selected)
                 .putString("target_type", targetType)
                 .apply()
 
             val typeLabel = if (targetType == "numeric") "Numeric" else "Categorical"
-            Toast.makeText(
-                this,
-                "Target column: $selected ($typeLabel)",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Target column: $selected ($typeLabel)", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun computeStats(
-        header: List<String>,
-        rows: List<List<String>>
-    ): List<ColumnStats> {
-        val nRows = rows.size.toDouble()
+    private fun computeStats(header: List<String>, rows: List<List<String>>): List<ColumnStats> {
+        val nRows = rows.size.toDouble().coerceAtLeast(1.0)
 
         return header.mapIndexed { colIdx, name ->
             val values = rows.map { row -> row.getOrNull(colIdx)?.trim().orEmpty() }
-            val numericValues = values.mapNotNull { it.toDoubleOrNull() }
 
             val missingCount = values.count { it.isEmpty() }
             val missingRatio = missingCount / nRows
 
+            val nonMissing = values.filter { it.isNotEmpty() }
+
+            val numericValues = nonMissing.mapNotNull { it.toDoubleOrNull() }
             val isNumeric = numericValues.isNotEmpty() && numericValues.size >= nRows * 0.5
 
-            if (!isNumeric) {
-                ColumnStats(name, false, null, null, null, null, missingRatio)
-            } else {
+            if (isNumeric) {
                 val mean = numericValues.average()
                 val min = numericValues.minOrNull()
                 val max = numericValues.maxOrNull()
@@ -156,21 +154,30 @@ class ColumnStatsActivity : AppCompatActivity() {
                     )
                 } else null
 
-                ColumnStats(name, true, mean, std, min, max, missingRatio)
+                ColumnStats(name, ColKind.NUMERIC, mean, std, min, max, missingRatio)
+            } else {
+                val unique = nonMissing.toSet().size
+                val catThreshold = maxOf(20, (nRows * 0.05).toInt())
+                val kind = if (unique <= catThreshold) ColKind.CATEGORICAL else ColKind.TEXT
+                ColumnStats(name, kind, null, null, null, null, missingRatio)
             }
         }
     }
 
     private fun makeRow(stat: ColumnStats): TableRow {
-        fun makeCell(text: String): TextView =
+        fun makeCell(text: String, bold: Boolean = false, alignStart: Boolean = false): TextView =
             TextView(this).apply {
                 this.text = text
-                textSize = 12f
-                setPadding(8)
+                textSize = 15f
+                setPadding(10, 10, 10, 10)
+                gravity = if (alignStart) Gravity.START else Gravity.CENTER
+                if (bold) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
             }
 
         return TableRow(this).apply {
-            addView(makeCell(stat.name))
+            addView(makeCell(stat.name, bold = true, alignStart = true))
             addView(makeCell(stat.mean?.format3() ?: "-"))
             addView(makeCell(stat.std?.format3() ?: "-"))
             addView(makeCell(stat.min?.format3() ?: "-"))

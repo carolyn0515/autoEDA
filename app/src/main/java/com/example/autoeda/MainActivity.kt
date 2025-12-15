@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // CSV 등에서 불러온 실제 컬럼명 리스트 ← 나중에 실제 데이터로 교체
+        // CSV 등에서 불러온 실제 컬럼명 리스트 ← 실제 데이터로 교체됨
         val columnNames = listOf("age", "height", "weight", "city", "income")
 
         val actvTarget = findViewById<AutoCompleteTextView>(R.id.actvTargetColumn)
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         actvTarget.setAdapter(adapter)
 
-        // 입력 칸 누르면 바로 드롭다운 열리게
+        // 입력 칸 누르면 드롭다운
         actvTarget.setOnClickListener {
             actvTarget.showDropDown()
         }

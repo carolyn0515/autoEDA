@@ -1,16 +1,15 @@
 package com.example.autoeda
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Gravity
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.setPadding
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -23,93 +22,130 @@ class DataQualityActivity : AppCompatActivity() {
         val missingRatio: Double
     )
 
+    private lateinit var header: List<String>
+    private lateinit var rows: List<List<String>>
+    private lateinit var qualities: List<ColQuality>
+
+    private fun forwardIntent(clazz: Class<*>): Intent {
+        val intent = Intent(this, clazz)
+        val path = getCurrentCsvPath()
+        if (!path.isNullOrBlank()) intent.putExtra(DataSource.EXTRA_CSV_FILE_PATH, path)
+        return intent
+    }
+
+    private fun getCurrentCsvPath(): String? {
+        val prefs = getSharedPreferences(DataSource.PREFS_NAME, MODE_PRIVATE)
+        return intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+            ?: prefs.getString(DataSource.KEY_CSV_FILE_PATH, null)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data_quality)
 
-        // 1) iris.csv 로드
-        val inputStream = resources.openRawResource(R.raw.iris)
-        val csvLines = inputStream.bufferedReader().use { it.readLines() }
-        if (csvLines.isEmpty()) return
+        loadCsv()
 
-        val header = csvLines.first().split(",")
-        val rows = csvLines
-            .drop(1)
-            .filter { it.isNotBlank() }
-            .map { it.split(",") }
+        qualities = computeColumnQuality(header, rows)
 
-        // 2) 결측률 + 숫자 컬럼 여부
-        val qualities = computeColumnQuality(header, rows)
-
-        // 3) Missing Values UI 세팅
         setupMissingValues(qualities)
-
-        // 4) Correlation Heatmap UI 세팅
         setupCorrelationHeatmap(header, rows, qualities)
-
-        // 5) 상단 네비게이션 버튼
         setupNavigation()
     }
 
-    // ---- Data 계산 ----
+    // --------------------------- Utils ---------------------------
 
-    private fun computeColumnQuality(
-        header: List<String>,
-        rows: List<List<String>>
-    ): List<ColQuality> {
-        val nRows = rows.size.toDouble()
+    private fun dp(dp: Int): Int =
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp.toFloat(),
+            resources.displayMetrics
+        ).roundToInt()
+
+    private fun sp(sp: Float): Float = sp
+
+    private fun pickTextColorForBackground(bgColor: Int): Int {
+        val r = Color.red(bgColor)
+        val g = Color.green(bgColor)
+        val b = Color.blue(bgColor)
+        val luminance = (0.299 * r + 0.587 * g + 0.114 * b)
+        return if (luminance < 140) Color.WHITE else Color.BLACK
+    }
+
+    // --------------------------- CSV LOAD ---------------------------
+
+    private fun loadCsv() {
+        val intentPath = intent.getStringExtra(DataSource.EXTRA_CSV_FILE_PATH)
+        val csvLines = CsvLoader.loadLines(this, intentPath)
+        if (csvLines.isEmpty()) {
+            header = emptyList()
+            rows = emptyList()
+            return
+        }
+
+        header = CsvLoader.splitCsvLine(csvLines.first()).map { it.trim().trim('"') }
+        rows = csvLines.drop(1)
+            .filter { it.isNotBlank() }
+            .map { line -> CsvLoader.splitCsvLine(line).map { it.trim().trim('"') } }
+    }
+
+    // --------------------------- Data 계산 ---------------------------
+
+    private fun computeColumnQuality(header: List<String>, rows: List<List<String>>): List<ColQuality> {
+        val nRows = rows.size.toDouble().coerceAtLeast(1.0)
 
         return header.mapIndexed { colIdx, name ->
             val values = rows.map { row -> row.getOrNull(colIdx)?.trim().orEmpty() }
-
             val numericValues = values.mapNotNull { it.toDoubleOrNull() }
             val missingCount = values.count { it.isEmpty() }
             val missingRatio = missingCount / nRows
             val isNumeric = numericValues.isNotEmpty() && numericValues.size >= nRows * 0.5
 
-            ColQuality(
-                name = name,
-                isNumeric = isNumeric,
-                missingRatio = missingRatio
-            )
+            ColQuality(name, isNumeric, missingRatio)
         }
     }
 
-    // ---- Missing Values UI ----
+    // --------------------------- Missing Values UI ---------------------------
 
     private fun setupMissingValues(qualities: List<ColQuality>) {
         val container = findViewById<LinearLayout>(R.id.layoutMissingValues)
         container.removeAllViews()
 
-        val maxNameLen = qualities.maxOfOrNull { it.name.length } ?: 0
-        val nameWidth = (maxNameLen * 10).coerceAtLeast(60)  // 대충 고정 폭
+        val sorted = qualities.sortedByDescending { it.missingRatio }
+        val nameWidth = dp(120)
 
-        qualities.forEach { q ->
+        sorted.forEach { q ->
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 4, 0, 4)
                 gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, dp(10), 0, dp(10))
             }
 
             val tvName = TextView(this).apply {
                 text = q.name
-                textSize = 12f
+                textSize = sp(15f)
+                typeface = Typeface.DEFAULT_BOLD
                 width = nameWidth
+                setTextColor(Color.parseColor("#222222"))
             }
 
-            val progress = ProgressBar(
-                this, null, android.R.attr.progressBarStyleHorizontal
-            ).apply {
+            val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
                 max = 100
-                progress = (q.missingRatio * 100).roundToInt()
-                layoutParams = LinearLayout.LayoutParams(0, 20, 1f)
-                // 기본 tint 색 사용 (파란색 막대)
+                progress = (q.missingRatio * 100).roundToInt().coerceIn(0, 100)
+                layoutParams = LinearLayout.LayoutParams(0, dp(28), 1f).apply {
+                    marginStart = dp(10)
+                    marginEnd = dp(10)
+                }
+                progressTintList = ColorStateList.valueOf(Color.parseColor("#1E63FF"))
+                progressBackgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8E8E8"))
             }
 
             val tvPercent = TextView(this).apply {
                 text = String.format("%.1f%%", q.missingRatio * 100)
-                textSize = 12f
-                setPadding(8, 0, 0, 0)
+                textSize = sp(15f)
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(Color.parseColor("#222222"))
+                minWidth = dp(64)
+                gravity = Gravity.END
             }
 
             row.addView(tvName)
@@ -120,17 +156,14 @@ class DataQualityActivity : AppCompatActivity() {
         }
     }
 
-    // ---- Correlation Heatmap UI ----
+    // --------------------------- Correlation Heatmap UI ---------------------------
 
     private fun setupCorrelationHeatmap(
         header: List<String>,
         rows: List<List<String>>,
         qualities: List<ColQuality>
     ) {
-        val numericCols = qualities
-            .filter { it.isNumeric }
-            .map { it.name }
-
+        val numericCols = qualities.filter { it.isNumeric }.map { it.name }
         if (numericCols.isEmpty()) return
 
         val (names, matrix) = computeCorrelationMatrix(header, rows, numericCols)
@@ -138,25 +171,15 @@ class DataQualityActivity : AppCompatActivity() {
         val table = findViewById<TableLayout>(R.id.tableCorrHeatmap)
         table.removeAllViews()
 
-        // 헤더 행
-        val headerRow = TableRow(this)
-        headerRow.addView(makeCorrHeaderCell("")) // 좌상단 비우기
-        names.forEach { colName ->
-            headerRow.addView(makeCorrHeaderCell(colName))
-        }
+        val headerRow = TableRow(this).apply { setPadding(0, dp(6), 0, dp(6)) }
+        headerRow.addView(makeCorrHeaderCell(""))
+        names.forEach { colName -> headerRow.addView(makeCorrHeaderCell(colName)) }
         table.addView(headerRow)
 
-        // 각 행
         for (i in names.indices) {
-            val tr = TableRow(this)
-
-            // 행 이름
+            val tr = TableRow(this).apply { setPadding(0, dp(4), 0, dp(4)) }
             tr.addView(makeCorrHeaderCell(names[i]))
-
-            for (j in names.indices) {
-                val corr = matrix[i][j]
-                tr.addView(makeCorrValueCell(corr))
-            }
+            for (j in names.indices) tr.addView(makeCorrValueCell(matrix[i][j]))
             table.addView(tr)
         }
     }
@@ -166,30 +189,25 @@ class DataQualityActivity : AppCompatActivity() {
         rows: List<List<String>>,
         numericCols: List<String>
     ): Pair<List<String>, Array<DoubleArray>> {
+        val colIndices = numericCols.map { header.indexOf(it) }
 
-        val colIndices = numericCols.map { colName ->
-            header.indexOf(colName)
-        }
-
-        // 각 컬럼의 numeric 값 리스트
+        // numeric 값 (결측/비숫자 제거)
         val dataCols: List<List<Double>> = colIndices.map { idx ->
             rows.mapNotNull { row -> row.getOrNull(idx)?.trim()?.toDoubleOrNull() }
         }
 
-        val n = dataCols.first().size
+        val n = dataCols.firstOrNull()?.size ?: 0
         val k = dataCols.size
         val matrix = Array(k) { DoubleArray(k) }
 
-        // 각 컬럼 평균, 표준편차
-        val means = DoubleArray(size = k) { i -> dataCols[i].average() }
-        val stds = DoubleArray(size = k) { i ->
+        val means = DoubleArray(k) { i -> dataCols[i].average() }
+        val stds = DoubleArray(k) { i ->
             val m = means[i]
             val vals = dataCols[i]
-            val variance = vals.sumOf { (it - m) * (it - m) } / (n - 1)
-            sqrt(variance)   // ← 마지막 줄에 Double을 리턴
+            val variance = if (n > 1) vals.sumOf { (it - m) * (it - m) } / (n - 1) else 0.0
+            sqrt(variance)
         }
 
-        // 상관계수 계산 (Pearson)
         for (i in 0 until k) {
             for (j in 0 until k) {
                 if (i == j) {
@@ -198,12 +216,12 @@ class DataQualityActivity : AppCompatActivity() {
                     var sum = 0.0
                     val xi = dataCols[i]
                     val xj = dataCols[j]
-                    for (t in 0 until n) {
-                        sum += (xi[t] - means[i]) * (xj[t] - means[j])
-                    }
-                    val cov = sum / (n - 1)
-                    matrix[i][j] = if (stds[i] == 0.0 || stds[j] == 0.0) 0.0
-                    else cov / (stds[i] * stds[j])
+                    val nn = minOf(xi.size, xj.size)
+                    for (t in 0 until nn) sum += (xi[t] - means[i]) * (xj[t] - means[j])
+                    val cov = if (nn > 1) sum / (nn - 1) else 0.0
+                    matrix[i][j] =
+                        if (stds[i] == 0.0 || stds[j] == 0.0) 0.0
+                        else cov / (stds[i] * stds[j])
                 }
             }
         }
@@ -214,34 +232,35 @@ class DataQualityActivity : AppCompatActivity() {
     private fun makeCorrHeaderCell(text: String): TextView =
         TextView(this).apply {
             this.text = text
-            textSize = 11f
-            setPadding(8, 4, 8, 4)
+            textSize = sp(14f)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
             gravity = Gravity.CENTER
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#222222"))
+            setBackgroundColor(Color.parseColor("#F2F2F2"))
         }
 
     private fun makeCorrValueCell(corr: Double): TextView {
-        val txt = TextView(this).apply {
+        val bg = heatColor(corr)
+        return TextView(this).apply {
             text = String.format("%.2f", corr)
-            textSize = 11f
-            setPadding(4, 4, 4, 4)
+            textSize = sp(14f)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
             gravity = Gravity.CENTER
+            typeface = Typeface.DEFAULT_BOLD
+            setBackgroundColor(bg)
+            setTextColor(pickTextColorForBackground(bg))
         }
-
-        // |corr| 값으로 색 intensity 결정 (0~1 → 0~180)
-        val intensity = (abs(corr) * 180).roundToInt().coerceIn(0, 180)
-        // 양수: 파란색 쪽, 음수: 붉은색 쪽
-        txt.setBackgroundColor(
-            if (corr >= 0) {
-                Color.rgb(230 - intensity, 230 - intensity, 255)
-            } else {
-                Color.rgb(255, 230 - intensity, 230 - intensity)
-            }
-        )
-
-        return txt
     }
 
-    // ---- 상단 네비게이션 ----
+    private fun heatColor(corr: Double): Int {
+        val a = abs(corr).coerceIn(0.0, 1.0)
+        val intensity = (a * 150).roundToInt().coerceIn(0, 150)
+        return if (corr >= 0) Color.rgb(245 - intensity, 245 - intensity, 255)
+        else Color.rgb(255, 245 - intensity, 245 - intensity)
+    }
+
+    // --------------------------- Navigation ---------------------------
 
     private fun setupNavigation() {
         val btnColumn = findViewById<Button>(R.id.btnNavColumnStats)
@@ -250,22 +269,18 @@ class DataQualityActivity : AppCompatActivity() {
         val btnTarget = findViewById<Button>(R.id.btnNavTargetAnalysis)
 
         btnColumn.setOnClickListener {
-            startActivity(Intent(this, ColumnStatsActivity::class.java))
+            startActivity(forwardIntent(ColumnStatsActivity::class.java))
             finish()
         }
-
-        // DataQualityActivity 에서 자기 자신 버튼은 아무 동작 X
         btnDataQuality.setOnClickListener {
-            // no-op
+            // current
         }
-
         btnHistogram.setOnClickListener {
-            startActivity(Intent(this, HistogramActivity::class.java))
+            startActivity(forwardIntent(HistogramActivity::class.java))
             finish()
         }
-
         btnTarget.setOnClickListener {
-            startActivity(Intent(this, TargetAnalysisActivity::class.java))
+            startActivity(forwardIntent(TargetAnalysisActivity::class.java))
             finish()
         }
     }

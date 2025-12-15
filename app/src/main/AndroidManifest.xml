@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.autoeda">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AutoEDA">
 
-        <!-- ⭐ 앱 실행 시 바로 UploadActivity 띄우기 -->
         <activity
             android:name=".UploadActivity"
             android:exported="true">
@@ -20,10 +21,8 @@
             </intent-filter>
         </activity>
 
-        <!-- 이미 있음 -->
         <activity android:name=".ColumnStatsActivity" />
 
-        <!-- ⭐ 새로 추가해야 하는 3개 -->
         <activity android:name=".DataQualityActivity" />
         <activity android:name=".HistogramActivity" />
         <activity android:name=".TargetAnalysisActivity" />
